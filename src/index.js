@@ -12,6 +12,7 @@ import './index.css';
 import Grid from './components/Grid'
 import Buttons from './components/Buttons'
 import Buttons2 from './components/Buttons2'
+import Buttons3 from './components/Buttons3'
 
 // this is the whole page
 class Main extends Component {
@@ -308,30 +309,32 @@ class Main extends Component {
   render() {
     return(
       <div>
-        <h1>The Game of Life</h1>
-        <Buttons
-          playButton={this.playButton}
-          pauseButton={this.pauseButton}
-          slow={this.slow}
-          fast={this.fast}
-          clear={this.clear}
-          seed={this.seed}
-          gridSize={this.gridSize}
-        />
+        <h1>Life Simulator</h1> 
+        <h4>Time Passed: {this.state.generation}</h4>      
         <Grid 
           gridFull={this.state.gridFull} 
           rows={this.rows}
           cols={this.cols}
           selectBox={this.selectBox}
         />
+         <Buttons
+          playButton={this.playButton}
+          pauseButton={this.pauseButton}         
+        />
         <Buttons2
+           slow={this.slow}
+           fast={this.fast}
+           clear={this.clear}
+           seed={this.seed}
+           gridSize={this.gridSize}
+        />     
+         <Buttons3
           eatRate = {this.eatRate}
           birthRate = {this.birthRate}
           plantDie = {this.plantDie}
           plantSpawn = {this.plantSpawn}
           overPop = {this.overPop}
-        />
-        <h3>Time Passed: {this.state.generation}</h3>
+        />    
       </div>
     )
   }

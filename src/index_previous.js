@@ -1,9 +1,6 @@
 //---------------------------------------------------------
-// Game of Life                             7-30-19
-// This is a ReactJS based demo of Conways's Game of Life
-// https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
-// This is from a tutorial from freeCodeCamp.org
-// https://www.youtube.com/watch?v=PM0_Er3SvFQ&list=PLgZ1wCgBs2--7A5gx3uD23FrLi41-gTgV&index=10&t=1622s
+// My Game of Life                            7-30-19
+// This is modified from the tutorial demo react-life
 // Usage:
 // > npm start
 // then wait for React to open a browser window
@@ -14,15 +11,20 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import Grid from './components/Grid'
 import Buttons from './components/Buttons'
-
+import Buttons2 from './components/Buttons2'
 
 // this is the whole page
 class Main extends Component {
   constructor () {
     super();
-    this.speed = 150;
     this.rows = 30;
-    this.cols = 50;
+    this.cols = 50;    
+    this.speed = 1000;
+    this.creatureEatRate = 1;
+    this.creatureBirthRate = 1;
+    this.plantDieRate = 1;
+    this.plantSpawnRate = 1;
+    this.overPopRate = 1;
     this.state = {
       generation: 0,
       gridFull: Array(this.rows).fill().map(() => Array(this.cols).fill(1))
@@ -49,7 +51,10 @@ class Main extends Component {
     let gridCopy = arrayClone(this.state.gridFull);
     for (let i = 0; i < this.rows; i++) {
       for (let j = 0; j < this.cols; j++) {
-        if (Math.floor(Math.random() * 4) === 1) {
+        if (Math.floor(Math.random() * 20) === 1) {
+          gridCopy[i][j] = 3;
+        }
+        if (Math.floor(Math.random() * 10) === 1 && gridCopy[i][j] === 1) {
           gridCopy[i][j] = 2;
         }
       }
@@ -69,12 +74,12 @@ class Main extends Component {
   }
 
   fast = () => {
-    this.speed = 200;
+    this.speed = 1000;
     this.playButton();
   }
 
   slow = () => {
-    this.speed = 500;
+    this.speed = 4000;
     this.playButton();
   }
 
@@ -103,28 +108,192 @@ class Main extends Component {
     this.clear();
   }
 
+  eatRate = (val) => {
+    switch (val) {
+      case "1":
+        this.creatureEatRate = 1;
+        break;
+      case "2":
+        this.creatureEatRate = 2;
+        break;
+      default:
+        this.creatureEatRate = 3;
+    }
+    this.clear();
+  }
+
+  birthRate = (val) => {
+    switch (val) {
+      case "1":
+        this.creatureBirthRate = 1;
+        break;
+      case "2":
+        this.creatureBirthRate = 2;
+        break;
+      default:
+        this.creatureBirthRate = 3;
+    }
+    this.clear();
+  }
+
+  plantDie = (val) => {
+    switch (val) {
+      case "1":
+        this.plantDieRate = 1;
+        break;
+      case "2":
+        this.plantDieRate = 2;
+        break;
+      default:
+        this.plantDieRate = 3;
+    }
+    this.clear();
+  }
+
+  plantSpawn = (val) => {
+    switch (val) {
+      case "1":
+        this.plantSpawnRate = 1;
+        break;
+      case "2":
+        this.plantSpawnRate = 2;
+        break;
+      default:
+        this.plantSpawnRate = 3;
+    }
+    this.clear();
+  }
+
+  overPop = (val) => {
+    switch (val) {
+      case "1":
+        this.overPopRate = 1;
+        break;
+      case "2":
+        this.overPopRate = 2;
+        break;
+      default:
+        this.overPopRate = 3;
+    }
+    this.clear();
+  }
+
   play = () => {
-    // Two different versions of the grid (to avoid manipulating state directly)
+    // make a copy of the grid to avaoid changing state directly
     let g = this.state.gridFull;
     let g2 = arrayClone(this.state.gridFull);
+    let g3 = arrayClone(this.state.gridFull);
 
-    for (let i = 0; i < this.rows; i++) {
-      for (let j = 0; j < this.cols; j++) {
-        let count = 0;
-        if (i > 0) if (g[i - 1][j] === 2) count++;
-		    if (i > 0 && j > 0) if (g[i - 1][j - 1] === 2) count++;
-		    if (i > 0 && j < this.cols - 1) if (g[i - 1][j + 1] === 2) count++;
-		    if (j < this.cols - 1) if (g[i][j + 1] === 2) count++;
-		    if (j > 0) if (g[i][j - 1] === 2) count++;
-		    if (i < this.rows - 1) if (g[i + 1][j] === 2) count++;
-		    if (i < this.rows - 1 && j > 0) if (g[i + 1][j - 1] === 2) count++;
-		    if (i < this.rows - 1 && j < this.cols - 1) if (g[i + 1][j + 1] === 2) count++;
-		    if (g[i][j] === 2 && (count < 2 || count > 3)) g2[i][j] = 1;
-		    if (g[i][j] === 1 && count === 3) g2[i][j] = 2;
+    // check for food source and die if none
+    if ( this.state.generation % this.creatureEatRate === 0){ 
+      for (let k = 0; k < this.rows; k++) {
+        for (let l = 0; l < this.cols; l++) {  
+          let food = false;
+          if (g[k][l] === 2) {            
+            if (k > 0) if (g[k - 1][l] === 3) food = true;
+            if (k > 0 && l > 0) if (g[k - 1][l - 1] === 3) food = true;
+            if (k > 0 && l < this.cols - 1) if (g[k - 1][l + 1] === 3) food = true;
+            if (l < this.cols - 1) if (g[k][l + 1] === 3) food = true;
+            if (l > 0) if (g[k][l - 1] === 3) food = true;
+            if (k < this.rows - 1) if (g[k + 1][l] === 3) food = true;
+            if (k < this.rows - 1 && l > 0) if (g[k + 1][l - 1] === 3) food = true;
+            if (k < this.rows - 1 && l < this.cols - 1) if (g[k + 1][l + 1] === 3) food = true;
+            if (!food) {
+              g2[k][l] = 1;
+              g3[k][l] = 1;
+            }
+          }
+        }
       }
     }
+
+    // Check for over population, new births if not
+    if ( this.state.generation % (this.overPopRate + 1) === 1){ 
+      for (let i = 0; i < this.rows; i++) {
+        for (let j = 0; j < this.cols; j++) {
+          let count = 0;
+          if (i > 0) if (g2[i - 1][j] === 2) count++;
+          if (i > 0 && j > 0) if (g2[i - 1][j - 1] === 2) count++;
+          if (i > 0 && j < this.cols - 1) if (g2[i - 1][j + 1] === 2) count++;
+          if (j < this.cols - 1) if (g2[i][j + 1] === 2) count++;
+          if (j > 0) if (g2[i][j - 1] === 2) count++;
+          if (i < this.rows - 1) if (g2[i + 1][j] === 2) count++;
+          if (i < this.rows - 1 && j > 0) if (g2[i + 1][j - 1] === 2) count++;
+          if (i < this.rows - 1 && j < this.cols - 1) if (g2[i + 1][j + 1] === 2) count++;
+          if (g2[i][j] === 2 && count > 3) g3[i][j] = 1;  // die off if over population       
+          if (g2[i][j] === 1 && count > 0 && count < 2) g3[i][j] = 2; 
+        }
+      } 
+    }   
+
+    // Food is eaten
+    if ( this.state.generation % (this.plantDieRate + 1) === 1){  
+      for (let m = 0; m < this.rows; m++) {
+        for (let n = 0; n < this.cols; n++) { 
+          let count = 0;
+          if (g2[m][n] === 3){
+            if (m > 0) if (g2[m - 1][n] === 2) count++;
+            if (m > 0 && n > 0) if (g2[m - 1][n - 1] === 2) count++;
+            if (m > 0 && n < this.cols - 1) if (g2[m - 1][n + 1] === 2) count++;
+            if (n < this.cols - 1) if (g2[m][n + 1] === 2) count++;
+            if (n > 0) if (g2[m][n - 1] === 2) count++;
+            if (m < this.rows - 1) if (g2[m + 1][n] === 2) count++;
+            if (m < this.rows - 1 && n > 0) if (g2[m + 1][n - 1] === 2) count++;
+            if (m < this.rows - 1 && n < this.cols - 1) if (g2[m + 1][n + 1] === 2) count++;
+            if (count > 1) {
+              g2[m][n] = 1;
+              g3[m][n] = 1;
+            }
+          }
+        }
+      }
+    }
+
+    // food propogates 
+    if ( this.state.generation % (this.plantSpawnRate + 1) === 1){
+      for (let m = 0; m < this.rows; m++) {
+        for (let n = 0; n < this.cols; n++) { 
+          let expand = false;
+          if  (g2[m][n] === 3) {          
+            if (m > 0) if (g2[m - 1][n] === 1) {
+              expand = true;
+              g3[m - 1][n] = 3;
+            }
+            if (m > 0 && n > 0) if (g2[m - 1][n - 1] === 1 && expand === false) {
+              expand = true;
+              g3[m - 1][n - 1] = 3;
+            }
+            if (m > 0 && n < this.cols - 1) if (g2[m - 1][n + 1] === 1 && expand === false) {
+              expand = true;
+              g3[m - 1][n + 1] = 3;
+            }
+            if (n < this.cols - 1) if (g2[m][n + 1] === 1 && expand === false) {
+              expand = true;
+              g3[m][n + 1] = 3;
+            }
+            if (n > 0) if (g[m][n - 1] === 1 && expand === false) {
+              expand = true;
+              g3[m][n - 1] = 3;
+            }
+            if (m < this.rows - 1) if (g2[m + 1][n] === 1 && expand === false) {
+              expand = true;
+              g3[m + 1][n] = 3;
+            }
+            if (m < this.rows - 1 && n > 0) if (g2[m + 1][n - 1] === 1 && expand === false) {
+              expand = true;
+              g3[m + 1][n - 1] = 3;
+            }
+            if (m < this.rows - 1 && n < this.cols - 1) if (g2[m + 1][n + 1] === 1 && expand === false) {
+              expand = true;
+              g3[m + 1][n + 1] = 3;
+            }
+          }
+        }
+      }      
+    }
+
     this.setState({
-      gridFull: g2,
+      gridFull: g3,
       generation: this.state.generation + 1
     })
   }
@@ -155,7 +324,14 @@ class Main extends Component {
           cols={this.cols}
           selectBox={this.selectBox}
         />
-        <h2>Generations: {this.state.generation}</h2>
+        <Buttons2
+          eatRate = {this.eatRate}
+          birthRate = {this.birthRate}
+          plantDie = {this.plantDie}
+          plantSpawn = {this.plantSpawn}
+          overPop = {this.overPop}
+        />
+        <h3>Time Passed: {this.state.generation}</h3>
       </div>
     )
   }

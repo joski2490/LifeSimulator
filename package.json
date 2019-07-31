@@ -2,6 +2,7 @@
   "name": "react-life",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://quantummelody.com/react_life",
   "dependencies": {
     "react": "^16.8.6",
     "react-bootstrap": "^1.0.0-beta.10",
