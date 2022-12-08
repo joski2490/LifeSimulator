@@ -15,5 +15,4 @@ jobs:
      node-version: '16.x'
      cache: 'npm'
   - run: npm install
-  - run: npm ci
   - run: npm start
