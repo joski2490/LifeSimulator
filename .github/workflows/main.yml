@@ -19,13 +19,5 @@ jobs:
     env:
      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
    # `npm rebuild` will run all those post-install scripts for us.
-  - run: npm rebuild && npm run prepare --if-present
- start:
-  runs-on: ubuntu-latest
-  steps:
-  - uses: actions/checkout@v3
-  - uses: actions/setup-node@v3
-    with:
-     node-version: '14.x'   
-  - run: npm start
+  - run: npm rebuild && npm run prepare --if-present && npm start
   
