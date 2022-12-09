@@ -22,9 +22,9 @@ class Main extends Component {
     this.cols = 50;    
     this.speed = 1000;
     this.creatureEatRate = 1;
-    this.creatureBirthRate = 1;
+    this.creatureBirthRate = 2;
     this.plantDieRate = 1;
-    this.plantSpawnRate = 1;
+    this.plantSpawnRate = 2;
     this.overPopRate = 1;
     this.state = {
       generation: 0,
